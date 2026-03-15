@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.env
+
+# Node / Dashboard
+ev-dashboard/node_modules/
+ev-dashboard/dist/
+ev-dashboard/dist-ssr/
+ev-dashboard/*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/

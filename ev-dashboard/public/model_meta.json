@@ -1,0 +1,180 @@
+{
+  "labelEncoder": {
+    "classes": [
+      "Fault",
+      "Normal",
+      "Warning"
+    ],
+    "mapping": {
+      "Fault": 0,
+      "Normal": 1,
+      "Warning": 2
+    }
+  },
+  "scaler": {
+    "type": "StandardScaler",
+    "features": [
+      "Voltage (V)",
+      "Current (A)",
+      "Temperature (\u00b0C)",
+      "Motor Speed (RPM)",
+      "Estimated SOC (%)",
+      "Ground Truth SOC (%)",
+      "Residual (%)",
+      "SOC_Error"
+    ],
+    "mean": [
+      3.6053,
+      3.0006,
+      29.8913,
+      1247.7438,
+      92.5503,
+      91.3132,
+      1.989,
+      -1.2371
+    ],
+    "scale": [
+      0.0931,
+      1.0674,
+      5.0005,
+      87.6328,
+      4.0862,
+      4.6316,
+      1.3447,
+      1.9652
+    ],
+    "var": [
+      0.0087,
+      1.1393,
+      25.0048,
+      7679.5036,
+      16.6969,
+      21.4516,
+      1.8082,
+      3.8619
+    ]
+  },
+  "randomForest": {
+    "type": "RandomForestClassifier",
+    "accuracy": 1.0,
+    "n_estimators": 100,
+    "max_depth": null,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "n_features": 8,
+    "classes": [
+      0,
+      1,
+      2
+    ],
+    "feature_importances": [
+      0.00602,
+      0.01064,
+      0.00608,
+      0.00737,
+      0.01658,
+      0.03297,
+      0.59501,
+      0.32534
+    ],
+    "confusion_matrix": [
+      [
+        136,
+        0,
+        0
+      ],
+      [
+        0,
+        1150,
+        0
+      ],
+      [
+        0,
+        0,
+        1081
+      ]
+    ],
+    "report": {
+      "Fault": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 136
+      },
+      "Normal": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1150
+      },
+      "Warning": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1081
+      }
+    }
+  },
+  "xgboost": {
+    "type": "XGBClassifier",
+    "accuracy": 1.0,
+    "n_estimators": 100,
+    "max_depth": null,
+    "learning_rate": 0.1,
+    "subsample": null,
+    "colsample_bytree": null,
+    "n_features": 8,
+    "classes": [
+      0,
+      1,
+      2
+    ],
+    "feature_importances": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      3e-05,
+      0.99981,
+      0.00016
+    ],
+    "confusion_matrix": [
+      [
+        136,
+        0,
+        0
+      ],
+      [
+        0,
+        1150,
+        0
+      ],
+      [
+        0,
+        0,
+        1081
+      ]
+    ],
+    "report": {
+      "Fault": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 136
+      },
+      "Normal": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1150
+      },
+      "Warning": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1081
+      }
+    }
+  }
+}
