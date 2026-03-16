@@ -191,7 +191,7 @@ export default function App() {
               <ConfusionMatrix meta={meta} />
             </div>
           )}
-          {tab === 'predictor' && meta && <LivePredictor meta={meta} />}
+          {tab === 'predictor' && meta && <LivePredictor meta={meta} sampleData={data} />}
 
           {tab === 'data' && <DataTable data={filtered} />}
         </main>
