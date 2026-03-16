@@ -192,6 +192,7 @@ export default function App() {
             </div>
           )}
           {tab === 'predictor' && meta && <LivePredictor meta={meta} />}
+
           {tab === 'data' && <DataTable data={filtered} />}
         </main>
       </div>
