@@ -22,6 +22,8 @@ const NAV = [
 
 const STATUS_COLOR = { Normal: '#10b981', Warning: '#f59e0b', Fault: '#ef4444' }
 
+const API = import.meta.env.VITE_API_URL || ''
+
 export default function App() {
   const [data, setData]       = useState([])
   const [meta, setMeta]       = useState(null)
@@ -29,9 +31,46 @@ export default function App() {
   const [tab, setTab]         = useState('overview')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mobileOpen, setMobileOpen]   = useState(false)
+  const [dbOnline, setDbOnline]       = useState(false)
 
   useEffect(() => {
-    fetch('/ev_data_sample.json').then(r => r.json()).then(setData)
+    // Try API first, fall back to static JSON
+    const loadData = async () => {
+      try {
+        const health = await fetch(`${API}/api/health`).then(r => r.json())
+        if (health.status === 'ok') {
+          setDbOnline(true)
+          // Seed DB if empty, then fetch
+          await fetch(`${API}/api/telemetry/seed`, { method: 'POST' })
+          const { rows } = await fetch(`${API}/api/telemetry?limit=500`).then(r => r.json())
+          // Normalize DB column names back to original JSON keys
+          setData(rows.map(r => ({
+            'Time (ms)':             r.time_ms,
+            'Voltage (V)':           parseFloat(r.voltage),
+            'Current (A)':           parseFloat(r.current),
+            'Temperature (°C)':      parseFloat(r.temperature),
+            'Motor Speed (RPM)':     r.motor_speed_rpm,
+            'Hall Code':             r.hall_code,
+            'Estimated SOC (%)':     parseFloat(r.estimated_soc),
+            'Ground Truth SOC (%)':  parseFloat(r.ground_truth_soc),
+            'Residual (%)':          parseFloat(r.residual),
+            'SOC_Error':             parseFloat(r.soc_error),
+            'Fault Label':           r.fault_label,
+            'rf_pred':               r.rf_pred,
+            'xgb_pred':              r.xgb_pred,
+            'rf_prob_fault':         parseFloat(r.rf_prob_fault),
+            'rf_prob_normal':        parseFloat(r.rf_prob_normal),
+            'rf_prob_warning':       parseFloat(r.rf_prob_warning),
+            'xgb_prob_fault':        parseFloat(r.xgb_prob_fault),
+            'xgb_prob_normal':       parseFloat(r.xgb_prob_normal),
+            'xgb_prob_warning':      parseFloat(r.xgb_prob_warning),
+          })))
+          return
+        }
+      } catch (_) { /* API not available — use static files */ }
+      fetch('/ev_data_sample.json').then(r => r.json()).then(setData)
+    }
+    loadData()
     fetch('/model_meta.json').then(r => r.json()).then(setMeta)
   }, [])
 
@@ -112,6 +151,10 @@ export default function App() {
               <span className="text-xs font-semibold" style={{ color: STATUS_COLOR[systemStatus] }}>{systemStatus}</span>
             </div>
             <div className="text-[10px] text-slate-600">{faultCount} fault events detected</div>
+            <div className="flex items-center gap-1.5 mt-2">
+              <div className={`w-1.5 h-1.5 rounded-full ${dbOnline ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+              <span className="text-[10px] text-slate-600">{dbOnline ? 'MySQL connected' : 'Static JSON mode'}</span>
+            </div>
           </div>
         )}
 
