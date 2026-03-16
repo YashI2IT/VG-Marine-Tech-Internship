@@ -34,13 +34,27 @@ export default function SOCComparison({ data }) {
     if (byLabel[label]) byLabel[label].push({ x: d['Ground Truth SOC (%)'], y: d['Estimated SOC (%)'], label })
   })
 
-  // Residual histogram
-  const buckets = Array.from({ length: 12 }, (_, i) => {
+  // Dynamic reference line from actual data range
+  const allGT  = data.map(d => d['Ground Truth SOC (%)'])
+  const minSOC = allGT.length ? Math.floor(Math.min(...allGT)) : 80
+  const maxSOC = allGT.length ? Math.ceil(Math.max(...allGT))  : 105
+
+  // Dynamic residual histogram — bucket width 0.5, range from data
+  const residuals = data.map(d => d['Residual (%)'])
+  const maxRes = residuals.length ? Math.ceil(Math.max(...residuals) * 2) / 2 : 6
+  const bucketCount = Math.ceil(maxRes / 0.5)
+  const buckets = Array.from({ length: bucketCount }, (_, i) => {
     const lo = i * 0.5, hi = lo + 0.5
     const items = data.filter(d => d['Residual (%)'] >= lo && d['Residual (%)'] < hi)
     const dominant = ['Fault','Warning','Normal'].find(l => items.some(d => d['Fault Label'] === l)) || 'Normal'
     return { range: lo.toFixed(1), count: items.length, label: dominant }
   })
+
+  // Dynamic residual color thresholds from class boundaries in data
+  const normalResiduals  = data.filter(d => d['Fault Label'] === 'Normal').map(d => d['Residual (%)'])
+  const warningResiduals = data.filter(d => d['Fault Label'] === 'Warning').map(d => d['Residual (%)'])
+  const normalMax  = normalResiduals.length  ? Math.max(...normalResiduals)  : 1.5
+  const warningMax = warningResiduals.length ? Math.max(...warningResiduals) : 3.0
 
   const errors = data.map(d => Math.abs(d['Estimated SOC (%)'] - d['Ground Truth SOC (%)']))
   const mae    = errors.length ? (errors.reduce((a, b) => a + b, 0) / errors.length).toFixed(3) : '0.000'
@@ -83,7 +97,7 @@ export default function SOCComparison({ data }) {
                 label={{ value: 'Ground Truth SOC (%)', position: 'insideBottom', offset: -8, fill: '#3d4f6b', fontSize: 10 }} />
               <YAxis dataKey="y" name="Estimated" unit="%" tick={{ fontSize: 10, fill: '#3d4f6b' }} tickLine={false} axisLine={false} />
               <Tooltip content={<ScatterTip />} cursor={{ strokeDasharray: '3 3', stroke: '#334155' }} />
-              <ReferenceLine stroke="#2d3f5a" strokeDasharray="5 5" segment={[{x:81,y:81},{x:103,y:103}]} />
+              <ReferenceLine stroke="#2d3f5a" strokeDasharray="5 5" segment={[{x:minSOC,y:minSOC},{x:maxSOC,y:maxSOC}]} />
               {Object.entries(byLabel).map(([label, pts]) => (
                 <Scatter key={label} name={label} data={pts} fill={P[label]} opacity={0.7} r={2.5} />
               ))}

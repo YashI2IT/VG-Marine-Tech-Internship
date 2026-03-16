@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 
 const METRICS = [
-  { key: 'Voltage (V)',      color: '#818cf8', label: 'Voltage',     unit: 'V',  yDomain: [3.2, 4.1] },
-  { key: 'Current (A)',      color: '#38bdf8', label: 'Current',     unit: 'A',  yDomain: [0, 6] },
-  { key: 'Temperature (°C)', color: '#fb923c', label: 'Temperature', unit: '°C', yDomain: [10, 50] },
-  { key: 'Residual (%)',     color: '#f472b6', label: 'Residual',    unit: '%',  yDomain: [0, 6] },
+  { key: 'Voltage (V)',      color: '#818cf8', label: 'Voltage',     unit: 'V'  },
+  { key: 'Current (A)',      color: '#38bdf8', label: 'Current',     unit: 'A'  },
+  { key: 'Temperature (°C)', color: '#fb923c', label: 'Temperature', unit: '°C' },
+  { key: 'Residual (%)',     color: '#f472b6', label: 'Residual',    unit: '%'  },
 ]
 
 const Tip = ({ active, payload, label }) => {
@@ -40,10 +40,27 @@ export default function TimeSeriesChart({ data }) {
     fault: d['Fault Label'],
   }))
 
-  const zoomMap = { all: allData, first: allData.slice(0, 50), mid: allData.slice(50, 130), last: allData.slice(130) }
+  // Dynamic zoom segments — split into thirds based on actual data length
+  const n = allData.length
+  const t1 = Math.floor(n / 3)
+  const t2 = Math.floor((2 * n) / 3)
+  const tLabel1 = allData[t1 - 1]?.t ?? t1
+  const tLabel2 = allData[t2 - 1]?.t ?? t2
+
+  const zoomMap = {
+    all:   allData,
+    first: allData.slice(0, t1),
+    mid:   allData.slice(t1, t2),
+    last:  allData.slice(t2),
+  }
+  const zoomLabels = [
+    ['all',   'All'],
+    ['first', `0–${tLabel1}s`],
+    ['mid',   `${tLabel1}–${tLabel2}s`],
+    ['last',  `${tLabel2}s+`],
+  ]
   const chartData = zoomMap[zoom] || allData
 
-  // Fault event markers
   const faultIdxs = chartData.reduce((a, d) => { if (d.fault === 'Fault') a.push(d.t); return a }, [])
 
   return (
@@ -71,7 +88,7 @@ export default function TimeSeriesChart({ data }) {
 
       {/* Zoom controls */}
       <div className="flex gap-1 mb-3">
-        {[['all','All'],['first','0–50s'],['mid','50–130s'],['last','130s+']].map(([v,l]) => (
+        {zoomLabels.map(([v,l]) => (
           <button key={v} onClick={() => setZoom(v)}
             className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
               zoom === v ? 'bg-slate-700 text-white' : 'text-slate-600 hover:text-slate-300'

@@ -141,7 +141,8 @@ export default function App() {
               {NAV.find(n => n.id === tab)?.label}
             </h1>
             <p className="text-[11px] text-slate-500 hidden sm:block">
-              EV Battery Fault Diagnosis · 2,367 records · 100ms intervals
+              EV Battery Fault Diagnosis · {data.length.toLocaleString()} records
+              {data.length > 1 && ` · ${((data[1]?.['Time (ms)'] ?? 0) - (data[0]?.['Time (ms)'] ?? 0))}ms intervals`}
             </p>
           </div>
 

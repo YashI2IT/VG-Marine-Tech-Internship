@@ -24,9 +24,9 @@ const COLS = [
 
 const PAGE_SIZE = 12
 
-function ResidualBar({ value }) {
-  const pct = Math.min(100, (value / 5.6) * 100)
-  const color = value < 1.5 ? '#10b981' : value < 3 ? '#f59e0b' : '#ef4444'
+function ResidualBar({ value, maxRes, normalMax, warningMax }) {
+  const pct = Math.min(100, (value / maxRes) * 100)
+  const color = value <= normalMax ? '#10b981' : value <= warningMax ? '#f59e0b' : '#ef4444'
   return (
     <div className="flex items-center gap-2 justify-end">
       <span className="text-slate-300 font-mono">{value.toFixed(2)}</span>
@@ -42,6 +42,11 @@ export default function DataTable({ data }) {
   const [sortKey, setSortKey] = useState(null)
   const [sortDir, setSortDir] = useState('asc')
   const [search, setSearch]   = useState('')
+
+  // Derive residual thresholds from actual data
+  const maxRes     = data.length ? Math.max(...data.map(d => d['Residual (%)'])) : 6
+  const normalMax  = data.length ? Math.max(...data.filter(d => d['Fault Label'] === 'Normal').map(d => d['Residual (%)']))  : 1.5
+  const warningMax = data.length ? Math.max(...data.filter(d => d['Fault Label'] === 'Warning').map(d => d['Residual (%)'])) : 3.0
 
   const filtered = useMemo(() => {
     if (!search) return data
@@ -143,7 +148,7 @@ export default function DataTable({ data }) {
                           {row[c.key] || '—'}
                         </span>
                       ) : c.bar ? (
-                        <ResidualBar value={row[c.key]} />
+                        <ResidualBar value={row[c.key]} maxRes={maxRes} normalMax={normalMax} warningMax={warningMax} />
                       ) : (
                         <span className={c.mono ? 'text-slate-400 font-mono' : 'text-slate-300'}>
                           {typeof row[c.key] === 'number'

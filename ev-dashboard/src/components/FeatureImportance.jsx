@@ -82,9 +82,8 @@ export default function FeatureImportance({ meta }) {
           <span className="text-sm font-bold text-violet-400">{((chartData[0]?.importance || 0) * 100).toFixed(1)}%</span>
         </div>
         <div className="text-xs text-slate-500 mt-0.5">
-          {model === 'rf'
-            ? 'Residual (%) dominates RF — SOC estimation error is the primary fault signal'
-            : 'XGBoost relies almost entirely on Residual (%) — near-perfect separation'}
+          {chartData[0]?.feature} accounts for {((chartData[0]?.importance || 0) * 100).toFixed(1)}% of {src.type} decisions
+          {chartData[1] && ` · 2nd: ${chartData[1].feature} (${((chartData[1].importance) * 100).toFixed(1)}%)`}
         </div>
       </div>
     </div>

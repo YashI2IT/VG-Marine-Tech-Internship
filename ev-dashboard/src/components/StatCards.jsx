@@ -34,12 +34,21 @@ export default function StatCards({ data }) {
   const warning = data.filter(d => d['Fault Label'] === 'Warning').length
   const fault   = data.filter(d => d['Fault Label'] === 'Fault').length
   const avg = key => total ? data.reduce((s, d) => s + d[key], 0) / total : 0
+  const minOf = key => total ? Math.min(...data.map(d => d[key])) : 0
+  const maxOf = key => total ? Math.max(...data.map(d => d[key])) : 0
 
   const avgV   = avg('Voltage (V)').toFixed(3)
   const avgT   = avg('Temperature (°C)').toFixed(1)
   const avgSOC = avg('Estimated SOC (%)').toFixed(1)
-  const avgRPM = Math.round(avg('Motor Speed (RPM)'))
   const avgRes = avg('Residual (%)').toFixed(3)
+
+  const minV = minOf('Voltage (V)').toFixed(2)
+  const maxV = maxOf('Voltage (V)').toFixed(2)
+  const minT = minOf('Temperature (°C)').toFixed(1)
+  const maxT = maxOf('Temperature (°C)').toFixed(1)
+
+  const vRange = parseFloat(maxV) - parseFloat(minV) || 1
+  const tRange = parseFloat(maxT) - parseFloat(minT) || 1
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -53,11 +62,11 @@ export default function StatCards({ data }) {
         sub={`${((warning/total)*100||0).toFixed(1)}% of dataset`}
         accent="#f59e0b" pct={(warning/total)*100} />
       <Card icon={IconBolt}          label="Avg Voltage"      value={`${avgV} V`}
-        sub="Range 3.28 – 3.99 V"
-        accent="#8b5cf6" pct={((parseFloat(avgV)-3.28)/0.71)*100} />
+        sub={`Range ${minV} – ${maxV} V`}
+        accent="#8b5cf6" pct={((parseFloat(avgV)-parseFloat(minV))/vRange)*100} />
       <Card icon={IconThermometer}   label="Avg Temperature"  value={`${avgT} °C`}
-        sub="Range 12.1 – 46.2 °C"
-        accent="#f97316" pct={((parseFloat(avgT)-12.1)/34.1)*100} />
+        sub={`Range ${minT} – ${maxT} °C`}
+        accent="#f97316" pct={((parseFloat(avgT)-parseFloat(minT))/tRange)*100} />
       <Card icon={IconBattery}       label="Avg SOC"          value={`${avgSOC}%`}
         sub={`Avg residual ${avgRes}%`}
         accent="#10b981" pct={parseFloat(avgSOC)} />
