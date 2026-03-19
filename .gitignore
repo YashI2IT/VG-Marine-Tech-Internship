@@ -13,6 +13,11 @@ ev-dashboard/dist/
 ev-dashboard/dist-ssr/
 ev-dashboard/*.local
 ev-dashboard/.env
+motor-dashboard/node_modules/
+motor-dashboard/dist/
+motor-dashboard/dist-ssr/
+motor-dashboard/*.local
+motor-dashboard/.env
 
 # OS
 .DS_Store

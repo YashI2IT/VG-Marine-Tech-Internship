@@ -1,0 +1,371 @@
+{
+  "labelEncoder": {
+    "classes": [
+      "Elec_Damage",
+      "Healthy",
+      "Mech_Damage",
+      "Mech_Elec_Damage"
+    ],
+    "mapping": {
+      "Elec_Damage": 0,
+      "Healthy": 1,
+      "Mech_Damage": 2,
+      "Mech_Elec_Damage": 3
+    }
+  },
+  "allFeatures": [
+    "CURRENT (A) mean",
+    "CURRENT (A) std",
+    "CURRENT (A) max",
+    "CURRENT (A) rms",
+    "CURRENT (A) peak_to_peak",
+    "CURRENT (A) skew",
+    "CURRENT (A) kurtosis",
+    "CURRENT (A) crest_factor",
+    "ROTO (RPM) mean",
+    "ROTO (RPM) std",
+    "ROTO (RPM) max",
+    "ROTO (RPM) rms",
+    "ROTO (RPM) peak_to_peak",
+    "ROTO (RPM) skew",
+    "ROTO (RPM) kurtosis",
+    "ROTO (RPM) crest_factor",
+    "CURRENT (A) Frequency Center",
+    "CURRENT (A) Spectrum Area",
+    "CURRENT (A) Amp @ 1x RPM",
+    "CURRENT (A) Amp @ 2x RPM",
+    "CURRENT (A) Amp @ 3x RPM",
+    "ROTO (RPM) Frequency Center",
+    "ROTO (RPM) Spectrum Area",
+    "ROTO (RPM) Amp @ 1x RPM",
+    "ROTO (RPM) Amp @ 2x RPM",
+    "ROTO (RPM) Amp @ 3x RPM"
+  ],
+  "randomForest": {
+    "type": "RandomForestClassifier",
+    "accuracy": 1.0,
+    "n_estimators": 100,
+    "max_depth": null,
+    "n_features": 26,
+    "classes": [
+      "Elec_Damage",
+      "Healthy",
+      "Mech_Damage",
+      "Mech_Elec_Damage"
+    ],
+    "feature_importances": {
+      "features": [
+        "CURRENT (A) mean",
+        "CURRENT (A) std",
+        "CURRENT (A) max",
+        "CURRENT (A) rms",
+        "CURRENT (A) peak_to_peak",
+        "CURRENT (A) skew",
+        "CURRENT (A) kurtosis",
+        "CURRENT (A) crest_factor",
+        "ROTO (RPM) mean",
+        "ROTO (RPM) std",
+        "ROTO (RPM) max",
+        "ROTO (RPM) rms",
+        "ROTO (RPM) peak_to_peak",
+        "ROTO (RPM) skew",
+        "ROTO (RPM) kurtosis",
+        "ROTO (RPM) crest_factor",
+        "CURRENT (A) Frequency Center",
+        "CURRENT (A) Spectrum Area",
+        "CURRENT (A) Amp @ 1x RPM",
+        "CURRENT (A) Amp @ 2x RPM",
+        "CURRENT (A) Amp @ 3x RPM",
+        "ROTO (RPM) Frequency Center",
+        "ROTO (RPM) Spectrum Area",
+        "ROTO (RPM) Amp @ 1x RPM",
+        "ROTO (RPM) Amp @ 2x RPM",
+        "ROTO (RPM) Amp @ 3x RPM"
+      ],
+      "importances": [
+        0.05137,
+        0.034499,
+        0.046808,
+        0.053274,
+        0.011467,
+        0.013404,
+        0.010141,
+        0.056092,
+        0.221593,
+        0.022859,
+        0.072559,
+        0.201399,
+        0.003954,
+        0.019669,
+        0.012253,
+        0.003653,
+        0.069229,
+        0.024947,
+        0.003286,
+        0.004099,
+        0.005136,
+        0.018018,
+        0.030001,
+        0.005069,
+        0.002928,
+        0.002292
+      ]
+    },
+    "confusion_matrix": [
+      [
+        46,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        46,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        46,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        46
+      ]
+    ],
+    "report": {
+      "Elec_Damage": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 46
+      },
+      "Healthy": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 46
+      },
+      "Mech_Damage": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 46
+      },
+      "Mech_Elec_Damage": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 46
+      }
+    }
+  },
+  "xgboost": {
+    "type": "XGBClassifier",
+    "accuracy": 0.983696,
+    "n_estimators": 100,
+    "max_depth": null,
+    "learning_rate": 0.1,
+    "n_features": 5,
+    "classes": [
+      "Elec_Damage",
+      "Healthy",
+      "Mech_Damage",
+      "Mech_Elec_Damage"
+    ],
+    "feature_importances": {
+      "features": [
+        "ROTO (RPM) mean",
+        "ROTO (RPM) rms",
+        "ROTO (RPM) max",
+        "CURRENT (A) Frequency Center",
+        "CURRENT (A) crest_factor"
+      ],
+      "importances": [
+        0.687463,
+        0.0,
+        0.058132,
+        0.051974,
+        0.202432
+      ]
+    },
+    "confusion_matrix": [
+      [
+        45,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        44,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        46,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        46
+      ]
+    ],
+    "report": {
+      "Elec_Damage": {
+        "precision": 1.0,
+        "recall": 0.9783,
+        "f1": 0.989,
+        "support": 46
+      },
+      "Healthy": {
+        "precision": 1.0,
+        "recall": 0.9565,
+        "f1": 0.9778,
+        "support": 46
+      },
+      "Mech_Damage": {
+        "precision": 0.9583,
+        "recall": 1.0,
+        "f1": 0.9787,
+        "support": 46
+      },
+      "Mech_Elec_Damage": {
+        "precision": 0.9787,
+        "recall": 1.0,
+        "f1": 0.9892,
+        "support": 46
+      }
+    }
+  },
+  "decisionTree": {
+    "type": "DecisionTreeClassifier",
+    "accuracy": 0.983696,
+    "max_depth": 3,
+    "n_features": 26,
+    "classes": [
+      "Elec_Damage",
+      "Healthy",
+      "Mech_Damage",
+      "Mech_Elec_Damage"
+    ],
+    "feature_importances": {
+      "features": [
+        "CURRENT (A) mean",
+        "CURRENT (A) std",
+        "CURRENT (A) max",
+        "CURRENT (A) rms",
+        "CURRENT (A) peak_to_peak",
+        "CURRENT (A) skew",
+        "CURRENT (A) kurtosis",
+        "CURRENT (A) crest_factor",
+        "ROTO (RPM) mean",
+        "ROTO (RPM) std",
+        "ROTO (RPM) max",
+        "ROTO (RPM) rms",
+        "ROTO (RPM) peak_to_peak",
+        "ROTO (RPM) skew",
+        "ROTO (RPM) kurtosis",
+        "ROTO (RPM) crest_factor",
+        "CURRENT (A) Frequency Center",
+        "CURRENT (A) Spectrum Area",
+        "CURRENT (A) Amp @ 1x RPM",
+        "CURRENT (A) Amp @ 2x RPM",
+        "CURRENT (A) Amp @ 3x RPM",
+        "ROTO (RPM) Frequency Center",
+        "ROTO (RPM) Spectrum Area",
+        "ROTO (RPM) Amp @ 1x RPM",
+        "ROTO (RPM) Amp @ 2x RPM",
+        "ROTO (RPM) Amp @ 3x RPM"
+      ],
+      "importances": [
+        0.032347,
+        0.03417,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.581779,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.351705,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "confusion_matrix": [
+      [
+        46,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        45,
+        1,
+        0
+      ],
+      [
+        0,
+        2,
+        44,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        46
+      ]
+    ],
+    "report": {
+      "Elec_Damage": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 46
+      },
+      "Healthy": {
+        "precision": 0.9574,
+        "recall": 0.9783,
+        "f1": 0.9677,
+        "support": 46
+      },
+      "Mech_Damage": {
+        "precision": 0.9778,
+        "recall": 0.9565,
+        "f1": 0.967,
+        "support": 46
+      },
+      "Mech_Elec_Damage": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 46
+      }
+    }
+  }
+}
