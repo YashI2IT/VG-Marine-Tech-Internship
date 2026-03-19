@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IconGitBranch, IconLayers, IconTag, IconScale, IconCheckCircle, IconCpu, IconInfo } from './Icons'
+import { IconGitBranch, IconLayers, IconTag, IconScale, IconCheckCircle, IconCpu, IconInfo } from '../Icons'
 
 const CLASS_COLOR = { Fault: '#ef4444', Normal: '#10b981', Warning: '#f59e0b' }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IconTarget } from './Icons'
+import { IconTarget } from '../Icons'
 
 const CLASS_LABELS = ['Fault', 'Normal', 'Warning']
 const CLASS_COLOR  = { Fault: '#ef4444', Normal: '#10b981', Warning: '#f59e0b' }

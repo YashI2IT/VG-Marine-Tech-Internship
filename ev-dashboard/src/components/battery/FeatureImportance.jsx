@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { IconBarChart } from './Icons'
+import { IconBarChart } from '../Icons'
 
 const SHORT = {
   'Voltage (V)': 'Voltage',

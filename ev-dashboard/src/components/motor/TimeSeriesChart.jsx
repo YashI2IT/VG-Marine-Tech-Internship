@@ -1,60 +1,119 @@
 import { useState } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
-const SIGNAL_OPTIONS = [
-  { key: 'CURRENT (A) mean',         label: 'Current Mean (A)',  color: '#8b5cf6' },
-  { key: 'CURRENT (A) rms',          label: 'Current RMS (A)',   color: '#a78bfa' },
-  { key: 'CURRENT (A) max',          label: 'Current Max (A)',   color: '#f97316' },
-  { key: 'ROTO (RPM) mean',          label: 'RPM Mean',          color: '#10b981' },
-  { key: 'ROTO (RPM) rms',           label: 'RPM RMS',           color: '#06b6d4' },
-  { key: 'CURRENT (A) crest_factor', label: 'Crest Factor',      color: '#f59e0b' },
+const METRICS = [
+  { key: 'CURRENT (A) mean',         color: '#8b5cf6', label: 'I Mean',   unit: 'A'   },
+  { key: 'CURRENT (A) rms',          color: '#a78bfa', label: 'I RMS',    unit: 'A'   },
+  { key: 'CURRENT (A) max',          color: '#f97316', label: 'I Max',    unit: 'A'   },
+  { key: 'ROTO (RPM) mean',          color: '#10b981', label: 'RPM Mean', unit: 'rpm' },
+  { key: 'ROTO (RPM) rms',           color: '#06b6d4', label: 'RPM RMS',  unit: 'rpm' },
+  { key: 'CURRENT (A) crest_factor', color: '#f59e0b', label: 'Crest',    unit: ''    },
 ]
 
-export default function MotorTimeSeriesChart({ data }) {
-  const [sig1, setSig1] = useState(SIGNAL_OPTIONS[0].key)
-  const [sig2, setSig2] = useState(SIGNAL_OPTIONS[3].key)
-  if (!data.length) return null
+const CLASS_COLOR = {
+  Healthy: '#10b981', Elec_Damage: '#ef4444', Mech_Damage: '#f59e0b', Mech_Elec_Damage: '#8b5cf6',
+}
 
-  const chartData = data.map((row, i) => ({
+const Tip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="bg-[#0b0f1e] border border-slate-700/60 rounded-xl px-3 py-2.5 shadow-2xl min-w-[150px]">
+      <div className="text-[10px] text-slate-500 mb-2">Record #{label}</div>
+      {payload.map(p => (
+        <div key={p.dataKey} className="flex items-center justify-between gap-4 text-xs mb-1">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: p.color }} />
+            <span className="text-slate-400">{p.name}</span>
+          </div>
+          <span className="font-semibold text-white">{typeof p.value === 'number' ? p.value.toFixed(4) : p.value}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default function MotorTimeSeriesChart({ data }) {
+  const [active, setActive] = useState(['CURRENT (A) mean', 'ROTO (RPM) mean'])
+  const [zoom, setZoom] = useState('all')
+
+  const toggle = key => setActive(prev =>
+    prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+  )
+
+  const allData = data.map((row, i) => ({
     idx: i + 1,
-    [sig1]: parseFloat(row[sig1]) || 0,
-    [sig2]: parseFloat(row[sig2]) || 0,
+    ...Object.fromEntries(METRICS.map(m => [m.key, parseFloat(row[m.key]) || 0])),
+    class: row.Class,
   }))
-  const s1 = SIGNAL_OPTIONS.find(s => s.key === sig1)
-  const s2 = SIGNAL_OPTIONS.find(s => s.key === sig2)
+
+  const n = allData.length
+  const t1 = Math.floor(n / 3), t2 = Math.floor((2 * n) / 3)
+  const zoomMap = { all: allData, first: allData.slice(0, t1), mid: allData.slice(t1, t2), last: allData.slice(t2) }
+  const zoomLabels = [['all','All'],['first',`1–${t1}`],['mid',`${t1}–${t2}`],['last',`${t2}+`]]
+  const chartData = zoomMap[zoom] || allData
+
+  if (!data.length) return null
 
   return (
     <div className="bg-[#0b0f1e] border border-slate-800/60 rounded-2xl p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
         <div>
-          <div className="text-sm font-semibold text-white mb-0.5">Signal Time Series</div>
-          <div className="text-xs text-slate-500">{data.length} records · select signals to compare</div>
+          <div className="text-sm font-semibold text-white">Signal Time Series</div>
+          <div className="text-xs text-slate-500 mt-0.5">Motor telemetry · click legend to toggle</div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {[sig1, sig2].map((sig, idx) => (
-            <select key={idx} value={sig}
-              onChange={e => idx === 0 ? setSig1(e.target.value) : setSig2(e.target.value)}
-              className="bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 outline-none">
-              {SIGNAL_OPTIONS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
-            </select>
+        <div className="flex flex-wrap gap-1.5">
+          {METRICS.map(m => (
+            <button key={m.key} onClick={() => toggle(m.key)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border ${
+                active.includes(m.key) ? 'border-transparent' : 'border-slate-700/60 text-slate-600 bg-transparent'
+              }`}
+              style={active.includes(m.key) ? { backgroundColor: m.color+'15', color: m.color, borderColor: m.color+'35' } : {}}>
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active.includes(m.key) ? m.color : '#475569' }} />
+              {m.label}
+            </button>
           ))}
         </div>
       </div>
+
+      <div className="flex gap-1 mb-3">
+        {zoomLabels.map(([v, l]) => (
+          <button key={v} onClick={() => setZoom(v)}
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+              zoom === v ? 'bg-slate-700 text-white' : 'text-slate-600 hover:text-slate-300'
+            }`}>{l}</button>
+        ))}
+      </div>
+
       <ResponsiveContainer width="100%" height={240}>
-        <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-          <XAxis dataKey="idx" tick={{ fontSize: 10, fill: '#475569' }} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: '#475569' }} tickLine={false} axisLine={false} />
-          <Tooltip
-            contentStyle={{ backgroundColor: '#0b0f1e', border: '1px solid #1e293b', borderRadius: 8, fontSize: 11 }}
-            labelFormatter={v => `Record #${v}`}
-            formatter={(val, name) => [val.toFixed(4), name]} />
-          <Legend iconType="circle" iconSize={6}
-            formatter={v => <span style={{ color: '#94a3b8', fontSize: 11 }}>{v}</span>} />
-          <Line type="monotone" dataKey={sig1} name={s1?.label} stroke={s1?.color} dot={false} strokeWidth={1.5} />
-          <Line type="monotone" dataKey={sig2} name={s2?.label} stroke={s2?.color} dot={false} strokeWidth={1.5} />
-        </LineChart>
+        <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
+          <defs>
+            {METRICS.map(m => (
+              <linearGradient key={m.key} id={`mg-${m.label}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%"  stopColor={m.color} stopOpacity={0.18} />
+                <stop offset="95%" stopColor={m.color} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a2035" vertical={false} />
+          <XAxis dataKey="idx" tick={{ fontSize: 10, fill: '#3d4f6b' }} tickLine={false} axisLine={false}
+            label={{ value: 'Record #', position: 'insideBottomRight', offset: -4, fill: '#3d4f6b', fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10, fill: '#3d4f6b' }} tickLine={false} axisLine={false} />
+          <Tooltip content={<Tip />} />
+          {METRICS.filter(m => active.includes(m.key)).map(m => (
+            <Area key={m.key} type="monotone" dataKey={m.key} stroke={m.color}
+              fill={`url(#mg-${m.label})`} strokeWidth={1.5} dot={false} name={m.label} />
+          ))}
+        </AreaChart>
       </ResponsiveContainer>
+
+      <div className="flex flex-wrap gap-3 mt-3">
+        {Object.entries(CLASS_COLOR).map(([cls, color]) => (
+          <div key={cls} className="flex items-center gap-1.5 text-[10px] text-slate-500">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+            {cls.replace(/_/g, ' ')}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

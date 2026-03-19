@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from 'recharts'
-import { IconZap, IconShieldAlert, IconCheckCircle, IconAlertTriangle } from './Icons'
+import { IconZap, IconShieldAlert, IconCheckCircle, IconAlertTriangle } from '../Icons'
 
 const CLASS_COLOR = { Fault: '#ef4444', Normal: '#10b981', Warning: '#f59e0b' }
 const CLASS_ICON  = { Fault: IconShieldAlert, Normal: IconCheckCircle, Warning: IconAlertTriangle }

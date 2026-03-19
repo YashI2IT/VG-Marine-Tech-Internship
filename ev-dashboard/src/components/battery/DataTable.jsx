@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { IconChevronLeft, IconChevronRight, IconDatabase, IconFilter } from './Icons'
+import { IconChevronLeft, IconChevronRight, IconDatabase, IconFilter } from '../Icons'
 
 const BADGE = {
   Normal:  'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/25',

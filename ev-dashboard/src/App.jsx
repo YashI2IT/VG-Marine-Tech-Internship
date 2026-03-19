@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 
 // Battery components
-import StatCards from './components/StatCards'
-import FaultDistribution from './components/FaultDistribution'
-import TimeSeriesChart from './components/TimeSeriesChart'
-import SOCComparison from './components/SOCComparison'
-import ModelInfo from './components/ModelInfo'
-import DataTable from './components/DataTable'
-import FeatureImportance from './components/FeatureImportance'
-import ConfusionMatrix from './components/ConfusionMatrix'
-import LivePredictor from './components/LivePredictor'
+import StatCards from './components/battery/StatCards'
+import FaultDistribution from './components/battery/FaultDistribution'
+import TimeSeriesChart from './components/battery/TimeSeriesChart'
+import SOCComparison from './components/battery/SOCComparison'
+import ModelInfo from './components/battery/ModelInfo'
+import DataTable from './components/battery/DataTable'
+import FeatureImportance from './components/battery/FeatureImportance'
+import ConfusionMatrix from './components/battery/ConfusionMatrix'
+import LivePredictor from './components/battery/LivePredictor'
 
 // Motor components
 import MotorStatCards from './components/motor/StatCards'
@@ -40,26 +40,35 @@ const MOTOR_CLASS_COLOR = {
 
 const API = import.meta.env.VITE_API_URL || ''
 
-function SystemSwitcher({ system, onChange }) {
+function SystemToggle({ system, onChange }) {
+  const isBattery = system === 'battery'
   return (
-    <div className="flex items-center gap-1 bg-slate-900/80 border border-slate-700/50 rounded-2xl p-1">
+    <div className="relative flex items-center bg-slate-800/80 border border-slate-700/50 rounded-2xl p-1 gap-0.5">
+      {/* sliding pill */}
+      <div
+        className="absolute top-1 bottom-1 rounded-xl transition-all duration-300 ease-in-out"
+        style={{
+          width: 'calc(50% - 4px)',
+          left: isBattery ? '4px' : 'calc(50%)',
+          background: isBattery
+            ? 'linear-gradient(135deg,#1d4ed8,#3b82f6)'
+            : 'linear-gradient(135deg,#6d28d9,#8b5cf6)',
+          boxShadow: isBattery ? '0 2px 8px #3b82f630' : '0 2px 8px #8b5cf630',
+        }}
+      />
       <button onClick={() => onChange('battery')}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-          system === 'battery'
-            ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-            : 'text-slate-500 hover:text-slate-300'
+        className={`relative z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-200 flex-1 justify-center ${
+          isBattery ? 'text-white' : 'text-slate-500 hover:text-slate-300'
         }`}>
-        <IconEVCar className="w-4 h-4" />
-        <span className="hidden sm:inline">Battery</span>
+        <IconEVCar className="w-3.5 h-3.5 flex-shrink-0" />
+        <span>Battery</span>
       </button>
       <button onClick={() => onChange('motor')}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-          system === 'motor'
-            ? 'bg-violet-600/20 text-violet-400 border border-violet-500/30'
-            : 'text-slate-500 hover:text-slate-300'
+        className={`relative z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-200 flex-1 justify-center ${
+          !isBattery ? 'text-white' : 'text-slate-500 hover:text-slate-300'
         }`}>
-        <IconMotor className="w-4 h-4" />
-        <span className="hidden sm:inline">Motor</span>
+        <IconMotor className="w-3.5 h-3.5 flex-shrink-0" />
+        <span>Motor</span>
       </button>
     </div>
   )
@@ -194,26 +203,26 @@ export default function App() {
           )}
         </div>
 
-        {/* System switcher in sidebar */}
+        {/* System switcher in sidebar — collapsed icon only */}
+        {!sidebarOpen && (
+          <div className="flex flex-col gap-1 px-2 py-3 border-b border-slate-800/60">
+            {[
+              { id: 'battery', Icon: IconEVCar, color: '#3b82f6' },
+              { id: 'motor',   Icon: IconMotor,  color: '#8b5cf6' },
+            ].map(({ id, Icon, color }) => (
+              <button key={id} onClick={() => switchSystem(id)} title={id === 'battery' ? 'Battery System' : 'Motor System'}
+                className="w-full flex items-center justify-center p-2 rounded-xl transition-all"
+                style={system === id ? { backgroundColor: color + '18' } : {}}>
+                <Icon className="w-4 h-4" style={{ color: system === id ? color : '#475569' }} />
+              </button>
+            ))}
+          </div>
+        )}
+
         {sidebarOpen && (
           <div className="px-3 py-3 border-b border-slate-800/60">
             <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-2 font-medium px-1">System</div>
-            <div className="flex flex-col gap-1">
-              {[
-                { id: 'battery', label: 'Battery System', Icon: IconEVCar, color: '#3b82f6' },
-                { id: 'motor',   label: 'Motor System',   Icon: IconMotor,  color: '#8b5cf6' },
-              ].map(({ id, label, Icon, color }) => (
-                <button key={id} onClick={() => switchSystem(id)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
-                    system === id ? 'text-white' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/40'
-                  }`}
-                  style={system === id ? { backgroundColor: color + '18', border: `1px solid ${color}30` } : {}}>
-                  <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: system === id ? color : undefined }} />
-                  <span>{label}</span>
-                  {system === id && <div className="ml-auto w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />}
-                </button>
-              ))}
-            </div>
+            <SystemToggle system={system} onChange={switchSystem} />
           </div>
         )}
 
@@ -309,8 +318,8 @@ export default function App() {
             </p>
           </div>
 
-          {/* System switcher (topbar, mobile-friendly) */}
-          <SystemSwitcher system={system} onChange={switchSystem} />
+          {/* System toggle */}
+          <SystemToggle system={system} onChange={switchSystem} />
 
           {/* Filters */}
           <div className="flex items-center gap-1 bg-slate-800/80 rounded-xl px-1.5 py-1.5 overflow-x-auto max-w-[180px] sm:max-w-none">

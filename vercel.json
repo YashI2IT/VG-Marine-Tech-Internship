@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd ev-dashboard && npm install && npm run build",
-  "outputDirectory": "ev-dashboard/dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}

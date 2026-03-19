@@ -1,4 +1,4 @@
-import { IconDatabase, IconShieldAlert, IconAlertTriangle, IconBolt, IconThermometer, IconBattery } from './Icons'
+import { IconDatabase, IconShieldAlert, IconAlertTriangle, IconBolt, IconThermometer, IconBattery } from '../Icons'
 
 function Card({ icon: Icon, label, value, sub, accent, pct, delta }) {
   return (
