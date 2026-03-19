@@ -3,6 +3,8 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import telemetryRoutes from './routes/telemetry.js'
 import predictionsRoutes from './routes/predictions.js'
+import motorTelemetryRoutes from './routes/motorTelemetry.js'
+import motorPredictionsRoutes from './routes/motorPredictions.js'
 
 dotenv.config()
 
@@ -12,8 +14,10 @@ const PORT = process.env.API_PORT || 3001
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || '*' }))
 app.use(express.json())
 
-app.use('/api/telemetry',   telemetryRoutes)
-app.use('/api/predictions', predictionsRoutes)
+app.use('/api/telemetry',          telemetryRoutes)
+app.use('/api/predictions',        predictionsRoutes)
+app.use('/api/motor-telemetry',    motorTelemetryRoutes)
+app.use('/api/motor-predictions',  motorPredictionsRoutes)
 
 // Health check
 app.get('/api/health', (_, res) => res.json({ status: 'ok', ts: new Date().toISOString() }))
